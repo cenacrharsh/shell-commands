@@ -1,0 +1,8 @@
+NVM COMMANDS:
+
+nvm help
+nvm list
+nvm uninstall x.y.z
+nvm use x.y.z
+nvm install latest
+nvm list available

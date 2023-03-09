@@ -1,0 +1,5 @@
+cd D:
+
+ls
+
+git reset HEAD~1 --hard => undo a git pull command //# article: https://careerkarma.com/blog/undo-git-pull/

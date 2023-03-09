@@ -1,0 +1,528 @@
+MongoDB Shell Commands
+
+db.help()
+
+
+atlas auth register
+
+atlas auth login
+
+// use mongosh to connect to your Atlas cluster
+mongosh -u myAtlasDBUser -p myatlas-001 $MY_ATLAS_CONNECTION_STRING/sample_supplies
+
+atlas setup --clusterName myAtlasClusterEDU --provider AWS --currentIp --skipSampleData --username myAtlasDBUser --password myatlas-001 | tee atlas_cluster_details.txt
+
+atlas clusters loadSampleData myAtlasClusterEDU
+
+
+/* MongoDB CRUD Operations: Insert and Find Documents */
+use sample_database
+
+db.sample_collection.insertOne({...})
+
+db.sample_collection.insertMany([{...}, {...}])
+
+db.sample_collection.find({ _id: ObjectId("5bd761dcae323e45a93ccff4")})
+
+db.sample_collection.find({ storeLocation: { $in: ["London", "New York"] } }) => The $in operator allows you to select all documents that have a field value equal to any of the values that are specified in the array.
+
+// Comparison Operators
+db.sales.find({ "items.price": { $gt: 50}})
+
+db.sales.find({ "items.price": { $lt: 50}})
+
+db.sales.find({ "customer.age": { $lte: 65}})
+
+db.sales.find({ "customer.age": { $gte: 65}})... "it" for more documents
+
+// Querying on Array Elements in MongoDB
+db.accounts.find({ products: "InvestmentFund"}) => Find Documents with an Array That Contains a Specified Value, regardless of whether the products field was an array or string
+
+db.sales.find({
+  items: {
+    $elemMatch: { name: "laptop", price: { $gt: 800 }, quantity: { $gte: 1 } },
+  }}) => find a subdocument that matches specific criteria in an array
+
+// Logical Operators
+db.routes.find({ "airline.name": "Southwest Airlines", stops: { $gte: 1 } }) => implicit $and
+
+db.routes.find({
+  $or: [{ dst_airport: "SEA" }, { src_airport: "SEA" }],
+})
+
+db.routes.find({
+  $and: [
+    { $or: [{ dst_airport: "SEA" }, { src_airport: "SEA" }] },
+    { $or: [{ "airline.name": "American Airlines" }, { airplane: 320 }] },
+  ]
+})
+
+// Replace documents
+db.books.replaceOne(
+  {
+    _id: ObjectId("6282afeb441a74a98dbbec4e"),
+  },
+  {
+    title: "Data Science Fundamentals for Python and MongoDB",
+    isbn: "1484235967",
+    publishedDate: new Date("2018-5-10"),
+    thumbnailUrl:
+      "https://m.media-amazon.com/images/I/71opmUBc2wL._AC_UY218_.jpg",
+    authors: ["David Paper"],
+    categories: ["Data Science"],
+  }
+)
+
+db.podcasts.updateOne(
+  { title: "The Developer Hub" },
+  { $set: { topics: ["databases", "MongoDB"] } },
+  { upsert: true }
+) => The $set operator replaces the value of a field with the specified value or creates the field if it doesn't exist, The upsert option creates a new document if no documents match the filtered criteria
+
+db.podcasts.updateOne(
+  { _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8") },
+  { $push: { hosts: "Nic Raboy" } }
+) => The $push operator adds a new value to the hosts array field
+
+db.birds.updateOne(
+  { _id: ObjectId("6268471e613e55b82d7065d7") },
+  {
+    $push: {
+      diet: { $each: ["newts", "opossum", "skunks", "squirrels"] },
+    },
+  }
+) => we use the $each modifier to add multiple elements to the array
+
+db.birds.updateOne(
+  {
+    common_name: "Robin Redbreast",
+  },
+  {
+    $inc: {
+      "sightings": 1,
+    },
+    $set: {
+      last_updated: new Date(),
+    },
+  },
+  {
+    upsert: true,
+  }
+) => $inc is used to increment the value by 1
+
+db.podcasts.findAndModify({
+  query: { _id: ObjectId("6261a92dfee1ff300dc80bf1") },
+  update: { $inc: { subscribers: 1 } },
+  new: true,
+}) => The findAndModify() method is used to find and replace a single document in MongoDB
+
+db.books.updateMany(
+  { publishedDate: { $lt: new Date("2019-01-01") } },
+  { $set: { status: "LEGACY" } }
+)
+
+db.birds.updateMany(
+  {
+    common_name: {
+      $in: ["Blue Jay", "Grackle"],
+    },
+  },
+  {
+    $set: {
+      last_seen: ISODate("2022-01-01"),
+    },
+  }
+)
+
+// Delete documents
+db.podcasts.deleteOne({ _id: Objectid("6282c9862acb966e76bbf20a") })
+
+db.podcasts.deleteMany({category: “crime”})
+
+// Modifying Query Results => whatever results the query returns is called a cursor
+
+// Return data on all music companies, sorted alphabetically from A to Z.
+db.companies.find({ category_code: "music" }).sort({ name: 1 }); => cursor.sort() to return query results in a specified order
+
+// Return data on all music companies, sorted alphabetically from A to Z. Ensure consistent sort order
+db.companies.find({ category_code: "music" }).sort({ name: 1, _id: 1 }); => To ensure documents are returned in a consistent order, include a field that contains unique values in the sort.
+
+// Return the three music companies with the highest number of employees. Ensure consistent sort order.
+db.companies
+  .find({ category_code: "music" })
+  .sort({ number_of_employees: -1, _id: 1 })
+  .limit(3); => limit(), specify the maximum number of documents to return
+
+// Returning Specific Data from a Query in MongoDB
+
+Syntax:// Return all restaurant inspections - business name, result, and _id fields only
+
+db.inspections.find(
+  { sector: "Restaurant - 818" },
+  { business_name: 1, result: 1 }
+) db.collection.find( <query>, <projection> ) => Include a field
+
+// Return all inspections with result of "Pass" or "Warning" - exclude date and zip code
+db.inspections.find(
+  { result: { $in: ["Pass", "Warning"] } },
+  { date: 0, "address.zip": 0 }
+) => Exclude a field
+
+// Return all restaurant inspections - business name and result fields only
+db.inspections.find(
+  { sector: "Restaurant - 818" },
+  { business_name: 1, result: 1, _id: 0 }
+) => _id field is an exception, otherwise we can either use inclusion approach or exclusion approach
+
+// Count number of trips over 120 minutes by subscribers
+db.trips.countDocuments({ tripduration: { $gt: 120 }, usertype: "Subscriber" }) => Counting Documents in a MongoDB Collection
+
+db.sales.countDocuments({ items: { $elemMatch: { name: "laptop", price: { $lt: 600 } } } } ) => here items field is an array of objects containing name and price fields
+
+// Aggregation
+
+// $match & $group
+db.zips.aggregate([
+{   
+   $match: { 
+      state: "CA"
+    },
+   $group: {
+      _id: "$city",
+      totalZips: { $count : { } }
+   }
+}
+]) => The $match stage filters for documents that match specified conditions, The $group stage groups documents by a group key.
+
+eg: 
+db.sightings.aggregate([
+  {
+    $match: {
+        species_common: 'Eastern Bluebird'
+    }
+  }, {
+    $group: {
+        _id: '$location.coordinates',
+        number_of_sightings: { $count: {} }
+    }
+  }
+])
+
+// $sort & $limit
+db.zips.aggregate([
+{
+  $sort: {
+    pop: -1
+  }
+},
+{
+  $limit: 3
+}
+]) => The $sort stage sorts all input documents and returns them to the pipeline in sorted order, The $limit stage returns only a specified number of records
+
+eg:
+db.sightings.aggregate([
+  {
+    $sort: {
+        'location.latitude': -1
+    }
+  }, {
+    $limit: 4
+  }
+])
+
+// $project & $set & $count
+{
+    $project: {
+        state:1, 
+        zip:1,
+        population:"$pop",
+        _id:0
+    }
+ }
+} => The $project stage specifies the fields of the output documents, The field can also be assigned a new value
+
+{
+    $set: {
+        place: {
+            $concat:["$city",",","$state"]
+        },
+        pop:10000
+     }
+} => The $set stage creates new fields or changes the value of existing fields, and then outputs the documents with the new fields
+
+{
+  $count: "total_zips"
+} => The $count stage creates a new document, with the number of documents at that stage in the aggregation pipeline assigned to the specified field name
+
+* $set is used to create or change values of new or existing fields. $project can be used to create or change the value of fields, but it can also be used to specify which fields to show in the documents in the aggregation pipeline.
+
+eg:
+db.sightings.aggregate([
+{
+  $match: {
+    date: {
+      $gt: ISODate('2022-01-01T00:00:00.000Z'),
+      $lt: ISODate('2023-01-01T00:00:00.000Z')
+    },
+    species_common: 'Eastern Bluebird'
+  }
+},
+{
+  $count: 'bluebird_sightings_2022'
+}
+])
+
+// $out
+db.sightings.aggregate([
+  {
+    $match: {
+        date: {
+            $gte: ISODate('2022-01-01T00:00:00.000Z'),
+            $lt: ISODate('2023-01-01T00:00:00.000Z')
+        }
+    }
+  }, {
+    $out: 'sightings_2022'
+  }
+]) => Creates a new collection (or completely erases an existing collection and replaces it with new data) that contains the documents in this stage of the aggregation pipeline.
+
+// Node.js eg.
+const pipeline = [
+  // Stage 1: match the accounts with a balance greater than $1,000
+  { $match: { balance: { $lt: 1000 } } },
+  // Stage 2: Calculate average balance and total balance
+  {
+    $group: {
+      _id: "$account_type",
+      total_balance: { $sum: "$balance" },
+      avg_balance: { $avg: "$balance" },
+    },
+  },
+]
+
+const pipeline = [
+  // Stage 1: $match - filter the documents (checking, balance >= 1500)
+  { $match: { account_type: "checking", balance: { $gte: 1500 } } },
+
+  // Stage 2: $sort - sorts the documents in descending order (balance)
+  { $sort: { balance: -1 } },
+
+  // Stage 3: $project - project only the requested fields and one computed field (account_type, account_id, balance, gbp_balance)
+  {
+    $project: {
+      _id: 0,
+      account_id: 1,
+      account_type: 1,
+      balance: 1,
+      // GBP stands for Great British Pound
+      gbp_balance: { $divide: ["$balance", 1.3] },
+    },
+  },
+]
+
+// MongoDB Indexes
+
+db.customers.createIndex({
+  birthdate: 1
+}) => Use createIndex() to create a new index in a collection. Within the parentheses of createIndex(), include an object that contains the field and sort order.
+
+db.customers.createIndex({
+  email: 1
+},
+{
+  unique:true
+}) => Add {unique:true} as a second, optional, parameter in createIndex() to force uniqueness in the index field values. Once the unique index is created, any inserts or updates including duplicated values in the collection for the index field/s will fail. MongoDB only creates the unique index if there is no duplication in the field values for the index field/s.
+
+db.customers.getIndexes() => Use getIndexes() to see all the indexes created in a collection.
+
+db.customers.explain().find({
+  birthdate: {
+    $gt:ISODate("1995-08-01")
+    }
+  }).sort({
+    email:1
+    }) => Use explain() in a collection when running a query to see the Execution plan. This plan provides the details of the execution stages (IXSCAN , COLLSCAN, FETCH, SORT, etc.).
+
+The IXSCAN stage indicates the query is using an index and what index is being selected.
+The COLLSCAN stage indicates a collection scan is perform, not using any indexes.
+The FETCH stage indicates documents are being read from the collection.
+The SORT stage indicates documents are being sorted in memory.
+
+// If a single field or compound index includes an array field, then the index is a multikey index. There can only be one array field per index, i.e. only one array field allowed in compound indexes. 
+
+// Internally MongoDB decomposes the array, & stores each unique value found within it as an individual index entry therefore Multikey indexes need to FETCH the documents after the IXSCAN stage because the index entries have each of the array values stored separately.
+
+db.customers.createIndex({
+  active:1, 
+  birthdate:-1,
+  name:1
+})
+
+// Order of Fields in a Compound Index
+The order of the fields matters when creating the index and the sort order. It is recommended to list the fields in the following order: Equality, Sort, and Range.
+
+Equality: field/s that matches on a single field value in a query
+Sort: field/s that orders the results by in a query
+Range: field/s that the query filter in a range of valid values
+
+Example of Optimized Query where FETCH is avoided using Projection
+// create a compound index using the `account_holder`, `balance` and `account_type` fields:
+db.accounts.createIndex({ account_holder: 1, balance: 1, account_type: 1 })
+
+// Use the explain method to view the winning plan for a query
+db.accounts.explain().find({ account_holder: "Andrea", balance:{ $gt :5 }}, { account_holder: 1, balance: 1, account_type:1, _id: 0}).sort({ balance: 1 })
+
+// Deleting an Index
+Use dropIndex() to delete an existing index from a collection. Within the parentheses of dropIndex(), include an object representing the index key or provide the index name as a string.
+
+Delete index by name:
+
+db.customers.dropIndex(
+  'active_1_birthdate_-1_name_1'
+)
+
+Delete index by key:
+
+db.customers.dropIndex({
+  active:1,
+  birthdate:-1, 
+  name:1
+})
+
+// Delete Indexes
+Use dropIndexes() to delete all the indexes from a collection, with the exception of the default index on _id.
+
+db.customers.dropIndexes()
+
+The dropIndexes() command also can accept an array of index names as a parameter to delete a specific list of indexes.
+
+db.collection.dropIndexes([
+  'index1name', 'index2name', 'index3name'
+  ])
+
+// we can also hideIndex() to stop using it but not deleting it, so we can reuse it later if needed, mongodb won't use such indexes but will update thier keys, This allows us to assess if removing the index affects the performance and unhide the index if needed. Unhiding an index is faster than recreating it.
+
+// Atlas Search Index
+Create:
+atlas clusters search indexes create --clusterName myAtlasClusterEDU -f /app/search_index.json
+
+Check the indexes:
+atlas clusters search indexes list --clusterName myAtlasClusterEDU --db sample_supplies --collection sales
+
+where the search_index.json file is:
+    {
+        "name": "sample_supplies-sales-dynamic",
+        "searchAnalyzer": "lucene.standard",
+        "analyzer": "lucene.standard",
+        "collectionName": "sales",
+        "database": "sample_supplies",
+        "mappings": {
+            "dynamic": true
+        }
+    } => A search with a dynamic index will query against all of the fields, including nested fields, A search with a dynamic index will query against all of the fields, including nested fields.
+
+Example how to use search index:
+db.sales.aggregate([
+  {
+    $search: {
+      index: 'sample_supplies-sales-dynamic',
+      text: {
+        query: 'notepad', path: { 'wildcard': '*' }
+      } } },
+  {
+    $set: {
+      score: { $meta: "searchScore" }
+      }
+  }
+]) => $search stage that uses the index sample_supplies-sales-dynamic with query value of notepad and a path wildcard of *, $set stage that adds a new field score to the document to represent the Atlas Search score { $meta: "searchScore" }
+
+// Create a Atlas Search Index With Static Mapping
+  {
+      "name": "sample_supplies-sales-static",
+      "searchAnalyzer": "lucene.standard",
+      "analyzer": "lucene.standard",
+      "collectionName": "sales",
+      "database": "sample_supplies",
+      "mappings": {
+          "dynamic": false,
+          "fields": {
+              "storeLocation": {
+                  "type": "string"
+              }
+          }
+      }
+  }
+
+// Using $search and Compound Operators to customize how search results are returned
+The compound operator within the $search aggregation stage allows us to give weight to different field and also filter our results without having to create additional aggregation stages. The four options for the compound operator are "must", "mustNot, "should", and "filter".
+
+"must" will exclude records that do not meet the criteria. "mustNot" will exclude results that do meet the criteria. "should" will allow you to give weight to results that do meet the criteria so that they appear first. "filter" will remove results that do not meet the criteria.
+
+$search {
+  "compound": {
+    "must": [{
+      "text": {
+        "query": "field",
+        "path": "habitat"
+      }
+    }],
+    "should": [{
+      "range": {
+        "gte": 45,
+        "path": "wingspan_cm",
+        "score": {"constant": {"value": 5}}
+      }
+    }]
+  }
+}
+
+// Grouping Search Results by Using Facets
+$searchMeta and $facet
+$searchMeta is an aggregation stage for Atlas Search where the metadata related to the search is shown. This means that if our search results are broken into buckets, using $facet, we can see that in the $searchMeta stage, because those buckets are information about how the search results are formatted.
+
+$searchMeta: {
+    "facet": {
+        "operator": {
+            "text": {
+            "query": ["Northern Cardinal"],
+            "path": "common_name"
+            }
+        },
+        "facets": {
+            "sightingWeekFacet": {
+                "type": "date",
+                "path": "sighting",
+                "boundaries": [ISODate("2022-01-01"), 
+                    ISODate("2022-01-08"),
+                    ISODate("2022-01-15"),
+                    ISODate("2022-01-22")],
+                "default" : "other"
+            }
+        }
+    }
+} => "facet" is an operator within $searchMeta. "operator" refers to the search operator - the query itself. "facets" operator is where we put the definition of the buckets for the facets.
+
+// ACID Transactions in MongoDB
+
+// Using a Transaction
+const session = db.getMongo().startSession()
+
+session.startTransaction()
+
+const account = session.getDatabase('< add database name here>').getCollection('<add collection name here>')
+
+/* Add database operations like .updateOne() here */
+
+session.commitTransaction()
+
+// Using a Transaction
+const session = db.getMongo().startSession()
+
+session.startTransaction()
+
+const account = session.getDatabase('< add database name here>').getCollection('<add collection name here>')
+
+//Add database operations like .updateOne() here
+
+session.abortTransaction()

@@ -1,0 +1,77 @@
+// in CMD
+
+wsl --help
+wsl -l || wsl --list
+wsl -l -v
+wsl --unregister Ubuntu-18.04
+
+// in WSL
+
+any_command --help (tells us how to use that command)
+
+uname -a
+
+lsb_release -a
+
+clear
+
+pwd (present working directory)
+
+cd /home (go one folder up, by default on /home/harsh) => absolute path
+
+cd /home/harsh (to move back to /home/harsh)
+
+cd .. (go up one folder) => relative path (/ is the root directory)
+
+cd home | cd harsh (can also use relative path WRT current folder, without a /)
+
+ls (shows everything that is inside of that directory)
+
+ls home (list everything in home folder => called arguments)
+
+echo hello | echo "hello" (output hello)
+
+which prog_name eg. which ls (tells where that program is located)
+
+// flags => --help is a flag
+
+ls -l (detailed info, long form output)
+
+ls -l -a (show hidden things as well, all) || ls -la (- means bunch of flags can be given one after another)
+
+touch .hidden-file (create a hidden file)
+
+// - for short forms, -- for long forms
+
+ls --ignore=folder_name || ls --ignore folder_name || ls -I folder_name (ignore a folder)
+
+ls -lsah (long, size, all, human readable)
+
+// CLI Search
+
+cd ~ (~ represents home directory, so it takes you from anywhere to home) | cd ~/folder_name
+
+cd / (/ represents root directory, so it takes you to root directory)
+
+ctrl + r (reverse search, and completes commands aq to our bash history)
+
+tail ~/.bash_history (shows bash history, not current commands, saved after logout)
+
+!! (executes the last command excuted, one usefull usecase is: sudo !!)
+
+// CLI Shortcuts
+
+CTRL + A – takes you to the beginning of the line
+CTRL + E – takes you to the end of the line
+CTRL + K – "yank" everything after the cursor
+CTRL + U – "yank" everything before the cursor
+CTRL + Y - "paste" (paste in quotes because it doesn't actually go into your system clipboard) everything you yanked
+CTRL + L - clear the screen
+CTRL + R – reverse search through history
+
+// Signals
+
+CTRL + C –> SIGINT (eg. commands to test: yes | tail -f .bash_history)
+CTRL + D –> SIGQUIT
+kill -l (show all signal commands)
+kill -9|-SIGKILL process_id (to immediately kill a process)

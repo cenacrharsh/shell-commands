@@ -1,0 +1,27 @@
+docker images = list of docker images
+
+docker ps = list running containers
+
+docker ps -a = (-a or --all = lists all containers, stopped and running)
+
+docker pull {name}:{tag} = pulls the specific version of image from docker hub eg: docker pull nginx:1.23
+
+docker pull {name} = pulls the latest version of image from docker hub
+
+docker run {name}:{tag} = creates a container from given image and starts it (flag -d or --detach => runs container in background and prints the conainer id) (if that image is not avaiable locally it first pulls that image and then runs it)
+
+docker run -d -p 9000:80 nginx:1.23 = run container with port binding (-p or --publish = publish a container's port to the host) (-p {HOST_PORT}:{CONTAINER_PORT})
+
+docker run --name web-app -d -p 9000:80 nginx:1.23 = (--name = assign a name to the container) (container name can be used in place of container id)
+
+docker logs {containerId} = view logs from service running inside the container, which are present at the time of execution (use the shorter container id obtained in docker ps command)
+
+docker logs -f --tail=100 {containerId}
+
+docker stop {containerId} = stop one or more running containers
+
+docker start {containerId} = start one or more stopped containers
+
+docker build {path} = builds a docker image from a Dockerfile
+
+docker build -t myapp:1.0 {path} = (-t or --tag = sets a name and optionally a tag in the name:tag format)

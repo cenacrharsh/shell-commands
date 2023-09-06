@@ -1,0 +1,64 @@
+# indicates superuser while $ indicates normal user
+~ represents home of current user, else we get the dir where we are eg. /home
+/ represents root folder
+
+clear
+
+echo Hello <-> echo 'Hello' <-> echo "Hello"
+
+exit
+
+pwd (print workign directory)
+
+cd (change directory) eg. cd .. <-> cd /root (paths can be relative or absolute) <-> cd - (to move into the directory you were in before)
+
+ls (list files and folders)
+ls -l (list everything with details, - represents files and d represents directories or folders and l generally points to some other folder in the system)
+
+cat (read files) eg. cat sampleFile
+To know about os version: cat /etc/os-release (from root)
+
+less (read long files) eg. less bigSampleFile (use arrow to move up and down, and q to quit)
+
+mkdir (create folders) eg. mkdir mySampleFolder <-> mkdir -p folder1/folder2/folder3 (use flag -p to make nested folders)
+
+rm (remove) eg. rm sampleFile
+rm -r sampleFolder (-r flag means recursively delete all the files inside the folder and then delete the folder)
+
+cp (copy files into some other location, or same location with a different name)
+cp sampleFile sampleFile.backup (make copy of sample file)
+cp -r folder1/ folder2 (make copy of folder1 using -r flag)
+
+touch (creates an empty file) eg. touch sampleFile
+
+mv (move command moves files and folders, workes as rename as well)
+mv bigtext bigtext.rename (will rename the file)
+mv bigtext folder1/ (move file inside folder1) <-> mv bigtext .. (move one folder back)
+
+which (tells where a particular binary is located, all commands we are using is a binary file stored on our system)
+which echo
+
+nano (text editor)
+nano textfile (creates file if not created)
+ctrl + ^ is used to start selecting
+alt + ^ can be used to copy without cutting
+ctrl + w (search in nano) (takes you to first iteration of the word, search again to go to 2nd iteration)
+
+ctrl + a (move to start of line)
+ctrl + e (move to end of line)
+
+rm -r * (delete all files inside the folder, rm -r /* will delete everything inside of the root as well)
+
+echo $? (get status code of previous bash command executed)
+
+exit 0/exit 1 (exit with status code of 0/1)
+
+apt is the package manager used in debian based systems (apt-get update/apt update)
+
+source .bashrc (restart bash, must do everytime we make changes to .bashrc file)
+
+top/htop (see all processes running on the system)
+
+kill -9 processPID -> SIGKILL/-9 (a signal to kill a process)
+
+lsof -i (find the process id for running ports)

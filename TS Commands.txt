@@ -1,0 +1,4 @@
+npm install -g typescript ts-node
+tsc --help
+
+ts-node index.ts (tsc index.ts & node index.js)

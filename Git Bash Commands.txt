@@ -3,3 +3,24 @@ cd D:
 ls
 
 git reset HEAD~1 --hard => undo a git pull command //# article: https://careerkarma.com/blog/undo-git-pull/
+
+// to see all files hidden and unhidden
+ls -a
+
+// if you like you can check the repo origin
+git remote -v
+
+// now delete .git which contains everything about git
+rm -rf .git
+
+// now you can init your repository with
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin github-url
+git push -u origin main
+
+// remote
+git remote remove origin
+git romote remote upstream
+git remote add upstream github-url

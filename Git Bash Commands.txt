@@ -7,9 +7,6 @@ git reset HEAD~1 --hard => undo a git pull command //# article: https://careerka
 // to see all files hidden and unhidden
 ls -a
 
-// if you like you can check the repo origin
-git remote -v
-
 // now delete .git which contains everything about git
 rm -rf .git
 
@@ -21,6 +18,28 @@ git remote add origin github-url
 git push -u origin main
 
 // remote
+git remote -v (if you like you can check the repo origin)
+git remote set-url origin `remote-url` (to change origin url of a repository)
+
 git remote remove origin
-git romote remote upstream
-git remote add upstream github-url
+git romote remove upstream
+git remote add upstream `remote-url`
+
+// branches
+git branch -v (show current branch)
+git switch `branch-name`
+
+// stashing
+git stash push
+git stash list
+git stash clear
+git stash pop
+
+ATBBEF5UdzFnVFBLTfM8wvRGGWSv5F2D7C1C
+
+// UPDATE git version for windows
+git update-git-for-windows
+
+// check name and email in config
+git config --global user.name
+git config --global user.email

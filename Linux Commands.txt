@@ -62,3 +62,6 @@ top/htop (see all processes running on the system)
 kill -9 processPID -> SIGKILL/-9 (a signal to kill a process)
 
 lsof -i (find the process id for running ports)
+
+// rename files
+mv oldFileName newFileName (only works if present in the files directory or use relative paths)

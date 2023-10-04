@@ -1,0 +1,28 @@
+// check if line endings settings in CRLF/LF
+git config core.autocrlf
+git config --global core.autocrlf false -> to set auto crlf to false
+
+// setup github username/email
+git config --global user.email "harsh.nishant.superstar@gmail.com"
+git config --global user.name "Kumar Harsh"
+
+// cache passwords in linux/wsl for 1 day
+git config --global credential.helper 'cache --timeout 86400'
+
+// undo last commit
+git reset HEAD~
+
+// remove git repository
+rm -rf .git (mac and linux) | rmdir -Force -Recurse .git (windows)
+
+// create and delete directories in wsl/linux
+mkdir directory-name
+rm -rf directory-name
+
+// create and delete files in wsl/linux
+touch file-name
+rm file-name
+
+// Drop Collection From Mongo Shell
+use dbName
+dbName.collectionName.drop()
